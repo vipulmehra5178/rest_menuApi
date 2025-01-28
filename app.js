@@ -14,8 +14,14 @@ const app = express();
 connectDB();
 
 // Middleware
-app.use(cors({ origin: process.env.ALLOWED_ORIGINS.split(","), credentials: true }));
-app.use(bodyParser.json());
+app.use(
+    cors({
+      origin: "*", // Allow all origins
+      methods: ["GET", "POST", "PUT", "DELETE"],
+      allowedHeaders: ["Content-Type", "Authorization"],
+    })
+  );
+  app.use(bodyParser.json());
 
 // Routes
 app.use("/api/menu", menuRoutes);

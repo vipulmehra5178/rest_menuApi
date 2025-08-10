@@ -1,16 +1,15 @@
 import MenuItem from "../models/MenuItem.js";
 
-// Get all menu items
 export const getAllMenuItems = async (req, res) => {
   try {
-    const menuItems = await MenuItem.find();
+    const menuItems = await MenuItem.find().lean(); 
+    res.set("Cache-Control", "public, max-age=60"); 
     res.json(menuItems);
   } catch (error) {
     res.status(500).json({ error: true, message: error.message });
   }
 };
 
-// Add a new menu item
 export const addMenuItem = async (req, res) => {
   try {
     const { name, description, price, image, category } = req.body;
@@ -22,7 +21,6 @@ export const addMenuItem = async (req, res) => {
   }
 };
 
-// Delete a menu item
 export const deleteMenuItem = async (req, res) => {
   try {
     const { id } = req.params;

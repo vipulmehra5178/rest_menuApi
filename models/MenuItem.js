@@ -8,5 +8,8 @@ const menuSchema = new mongoose.Schema({
   category: { type: String, required: true },
 });
 
+menuSchema.index({ category: 1 });
+menuSchema.index({ name: 1 });
+
 const MenuItem = mongoose.model("MenuItem", menuSchema);
 export default MenuItem;

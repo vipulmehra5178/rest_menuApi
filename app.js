@@ -21,7 +21,7 @@ app.use(
 
 app.use(compression());
 
-app.use("/api/menu", express.json(), menuRoutes);
+app.use("/api/menu", menuRoutes);
 
 app.use(errorHandler);
 

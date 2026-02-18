@@ -1,33 +1,43 @@
 import MenuItem from "../models/MenuItem.js";
 
-export const getAllMenuItems = async (req, res) => {
+export const getAllMenuItems = async (req, res, next) => {
   try {
-    const menuItems = await MenuItem.find().lean(); 
-    res.set("Cache-Control", "public, max-age=60"); 
-    res.json(menuItems);
+    const { page = 1, limit = 20, category } = req.query;
+
+    const query = category ? { category } : {};
+
+    const menuItems = await MenuItem.find(query)
+      .select("name price image category") 
+      .skip((page - 1) * limit)
+      .limit(Number(limit))
+      .lean();
+
+    res.set("Cache-Control", "public, max-age=120");
+    res.status(200).json(menuItems);
   } catch (error) {
-    res.status(500).json({ error: true, message: error.message });
+    next(error);
   }
 };
 
-export const addMenuItem = async (req, res) => {
+export const addMenuItem = async (req, res, next) => {
   try {
-    const { name, description, price, image, category } = req.body;
-    const newMenuItem = new MenuItem({ name, description, price, image, category });
-    await newMenuItem.save();
+    const newMenuItem = await MenuItem.create(req.body);
     res.status(201).json(newMenuItem);
   } catch (error) {
-    res.status(500).json({ error: true, message: error.message });
+    next(error);
   }
 };
 
-export const deleteMenuItem = async (req, res) => {
+export const deleteMenuItem = async (req, res, next) => {
   try {
-    const { id } = req.params;
-    const deletedItem = await MenuItem.findByIdAndDelete(id);
-    if (!deletedItem) return res.status(404).json({ error: true, message: "Menu item not found" });
-    res.json({ message: "Menu item deleted successfully" });
+    const deletedItem = await MenuItem.findByIdAndDelete(req.params.id);
+
+    if (!deletedItem) {
+      return res.status(404).json({ error: true, message: "Menu item not found" });
+    }
+
+    res.status(200).json({ message: "Menu item deleted successfully" });
   } catch (error) {
-    res.status(500).json({ error: true, message: error.message });
+    next(error);
   }
 };
